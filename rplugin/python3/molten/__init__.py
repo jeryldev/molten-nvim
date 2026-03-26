@@ -883,17 +883,25 @@ class Molten:
     def function_on_exit_pre(self, _: Any) -> None:
         self._deinitialize()
 
+    _ticking = False
+
     @pynvim.function("MoltenTick", sync=True)  # type: ignore
     @nvimui  # type: ignore
     def function_molten_tick(self, _: Any) -> None:
-        self._initialize_if_necessary()
-
-        molten_kernels = self._get_current_buf_kernels(False)
-        if molten_kernels is None:
+        if self._ticking:
             return
+        self._ticking = True
+        try:
+            self._initialize_if_necessary()
 
-        for m in molten_kernels:
-            m.tick()
+            molten_kernels = self._get_current_buf_kernels(False)
+            if molten_kernels is None:
+                return
+
+            for m in molten_kernels:
+                m.tick()
+        finally:
+            self._ticking = False
 
     @pynvim.function("MoltenTickInput", sync=False)  # type: ignore
     @nvimui  # type: ignore

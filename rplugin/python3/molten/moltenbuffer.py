@@ -390,8 +390,9 @@ class MoltenKernel:
             self._show_selected(self.selected_cell)
 
         if self.options.virt_text_output:
-            for span, output in self.outputs.items():
-                output.show_virtual_output(span.end)
+            for span, output in list(self.outputs.items()):
+                if span in self.outputs:
+                    output.show_virtual_output(span.end)
 
         self.canvas.present()
 
